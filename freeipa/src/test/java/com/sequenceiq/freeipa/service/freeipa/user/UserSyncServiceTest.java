@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -73,6 +74,8 @@ class UserSyncServiceTest {
     private static final String MACHINE_USER_CRN = "crn:cdp:iam:us-west-1:"
             + ACCOUNT_ID + ":machineUser:" + UUID.randomUUID().toString();
 
+    private static final String WORKLOAD_USER = "workloadUser";
+
     private static final int MAX_SUBJECTS_PER_REQUEST = 10;
 
     @Mock
@@ -97,27 +100,27 @@ class UserSyncServiceTest {
 
     @Test
     void testValidateParameters() {
-        underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(ENV_CRN), Set.of(USER_CRN), Set.of(MACHINE_USER_CRN));
+        underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(ENV_CRN), Set.of(USER_CRN), Set.of(MACHINE_USER_CRN), Optional.empty());
     }
 
     @Test
     void testValidateParametersBadEnv() {
         Assertions.assertThrows(BadRequestException.class, () -> {
-            underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(OTHER_CRN), Set.of(), Set.of());
+            underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(OTHER_CRN), Set.of(), Set.of(), Optional.empty());
         });
     }
 
     @Test
     void testValidateParametersBadUser() {
         Assertions.assertThrows(BadRequestException.class, () -> {
-            underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(), Set.of(OTHER_CRN), Set.of());
+            underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(), Set.of(OTHER_CRN), Set.of(), Optional.empty());
         });
     }
 
     @Test
     void testValidateParametersBadMachineUser() {
         Assertions.assertThrows(BadRequestException.class, () -> {
-            underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(), Set.of(), Set.of(OTHER_CRN));
+            underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(), Set.of(), Set.of(OTHER_CRN), Optional.empty());
         });
     }
 
@@ -125,7 +128,19 @@ class UserSyncServiceTest {
     void testValidateParametersWrongAccount() {
         String differentAccount = UUID.randomUUID().toString();
         Assertions.assertThrows(BadRequestException.class, () -> {
-            underTest.validateParameters(differentAccount, USER_CRN, Set.of(ENV_CRN), Set.of(), Set.of());
+            underTest.validateParameters(differentAccount, USER_CRN, Set.of(ENV_CRN), Set.of(), Set.of(), Optional.empty());
+        });
+    }
+
+    @Test
+    void testValidateDeleteUsersRequest() {
+        underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(), Set.of(USER_CRN), Set.of(), Optional.of(WORKLOAD_USER));
+    }
+
+    @Test
+    void testValidateParametersInvalidDeleteUsersRequest() {
+        Assertions.assertThrows(BadRequestException.class, () -> {
+            underTest.validateParameters(ACCOUNT_ID, USER_CRN, Set.of(), Set.of(USER_CRN), Set.of(MACHINE_USER_CRN), Optional.of(WORKLOAD_USER));
         });
     }
 
@@ -252,12 +267,12 @@ class UserSyncServiceTest {
             assertEquals(INTERNAL_ACTOR_CRN, ThreadBasedUserCrnProvider.getUserCrn());
             return null;
         })
-                .when(spyService).asyncSynchronizeUsers(anyString(), anyString(), anyString(), anyList(), anySet(), anySet(), anyBoolean());
+                .when(spyService).asyncSynchronizeUsers(anyString(), anyString(), anyString(), anyList(), any(), anyBoolean());
 
         spyService.synchronizeUsers("accountId", "actorCrn",
                 Set.of(), Set.of(), Set.of());
 
-        verify(spyService).asyncSynchronizeUsers(anyString(), anyString(), anyString(), anyList(), anySet(), anySet(), anyBoolean());
+        verify(spyService).asyncSynchronizeUsers(anyString(), anyString(), anyString(), anyList(), any(), anyBoolean());
     }
 
     @Test
