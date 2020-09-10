@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 
@@ -133,6 +134,7 @@ public abstract class AbstractIntegrationTest extends AbstractMinimalTest {
             response.cookie("ipa_session", "dummysession");
             return "";
         });
+        dynamicRouteStack.route(HttpMethod.HEAD, ITResponse.FREEIPA_ROOT + "/session/login_password", (request, response, model) -> "");
         dynamicRouteStack.post(ITResponse.FREEIPA_ROOT + "/session/json", freeIpaRouteHandler);
         dynamicRouteStack.get(ITResponse.FREEIPA_ROOT + "/session/json", freeIpaRouteHandler);
         dynamicRouteStack.get(ITResponse.FREEIPA_ROOT + "/user_find", freeIpaRouteHandler);
