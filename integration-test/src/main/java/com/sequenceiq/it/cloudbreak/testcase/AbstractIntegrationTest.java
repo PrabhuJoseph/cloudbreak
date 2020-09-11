@@ -319,6 +319,13 @@ public abstract class AbstractIntegrationTest extends AbstractMinimalTest {
                 .validate();
     }
 
+    protected void initializeDefaultImageCatalog(TestContext testContext) {
+        testContext
+                .init(ImageCatalogTestDto.class)
+                .when(imageCatalogTestClient.getImagesFromDefaultCatalog())
+                .validate();
+    }
+
     protected void initializeAzureCloudStorage(TestContext testContext) {
         azureCloudBlobUtil.createContainerIfNotExist();
     }

@@ -23,8 +23,9 @@ public abstract class ImageValidatorE2ETest extends AbstractE2ETest {
         testContext.getCloudProvider().getCloudFunctionality().cloudStorageInitialize();
         createDefaultUser(testContext);
         createDefaultCredential(testContext);
-        createEnvironmentWithNetworkAndFreeIpa(testContext);
         initializeDefaultBlueprints(testContext);
+        createDefaultImageCatalog(testContext);
+        createEnvironmentWithNetworkAndFreeIpa(testContext);
     }
 
     @BeforeMethod

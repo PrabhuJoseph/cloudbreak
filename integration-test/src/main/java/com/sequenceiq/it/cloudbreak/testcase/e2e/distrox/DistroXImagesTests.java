@@ -44,8 +44,9 @@ public class DistroXImagesTests extends AbstractE2ETest {
     protected void setupTest(TestContext testContext) {
         createDefaultUser(testContext);
         createDefaultCredential(testContext);
-        createEnvironmentWithNetworkAndFreeIpa(testContext);
         initializeDefaultBlueprints(testContext);
+        createDefaultImageCatalog(testContext);
+        createEnvironmentWithNetworkAndFreeIpa(testContext);
         createDatalake(testContext);
     }
 

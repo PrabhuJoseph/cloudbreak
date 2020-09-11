@@ -50,6 +50,7 @@ public class EnvironmentStopStartTests extends AbstractE2ETest {
     protected void setupTest(TestContext testContext) {
         createDefaultUser(testContext);
         initializeDefaultBlueprints(testContext);
+        createDefaultImageCatalog(testContext);
     }
 
     @Test(dataProvider = TEST_CONTEXT)
